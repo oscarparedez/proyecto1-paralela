@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include <GL/glut.h>
+#include <omp.h>
 #include <vector>
 
 using namespace std;
@@ -19,6 +20,8 @@ vector<float> arrayX;
 
 void display()
 {
+    static int frame_count = 0;
+    static int previous_time = glutGet(GLUT_ELAPSED_TIME);
     glClear(GL_COLOR_BUFFER_BIT);
     for (int j = 0; j < alfaParticle.size(); j++)
     {
@@ -40,10 +43,22 @@ void display()
     }
 
     glutSwapBuffers();
+
+    frame_count++;
+    int current_time = glutGet(GLUT_ELAPSED_TIME);
+    float elapsed_time = (current_time - previous_time) / 1000.0f; // Convert to seconds
+    if (elapsed_time > 1.0f) // Update every second
+    {
+        float fps = frame_count / elapsed_time;
+        printf("FPS: %.2f\n", fps);
+        frame_count = 0;
+        previous_time = current_time;
+    }
 }
 
 void update(int value)
 {
+    double start_time = omp_get_wtime();
     for (int i = 0; i < alfaParticle.size(); i++)
     {
 
@@ -94,10 +109,13 @@ void update(int value)
         }
     }
 
+    double end_time = omp_get_wtime();
+
+    double elapsed_time = end_time - start_time;
+    printf("Elapsed time: %.4f seconds\n", elapsed_time);
     glutPostRedisplay();
 
-    const int delay = 16;
-    glutTimerFunc(delay, update, 0);
+    glutTimerFunc(0, update, 0);
 }
 
 int main(int argc, char **argv)
