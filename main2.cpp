@@ -1,34 +1,28 @@
 #include <iostream>
 #include <math.h>
 #include <GL/glut.h>
+#include <vector>
 
 using namespace std;
 
-float p, a, b;
+float p, a;
 
 const int WIDTH = 1920;
 const int HEIGHT = 1080;
-const float radius = 25.0f;
+const float radius = 10.0f;
 
-float particles[6];
-float alfas[3];
-float beta[3];
-
-bool alfaParticle[6] = {true, false, false, false, false, false};
-
-float arrayX[6] = {50.0f, -200.0f, -40.0f, 60.0f, 150.0f, 300.0f};
-float arrayY[6] = {20.0f, 170.0f, 50.0f, 60.0f, -150.0f, -300.0f};
-
-float x = 0.0f, y = 0.0f;
-float arrayVX[6] = {10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-float arrayVY[6] = {-10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+vector<bool> alfaParticle;
+vector<float> arrayVX;
+vector<float> arrayVY;
+vector<float> arrayY;
+vector<float> arrayX;
 
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    for (int j = 0; j < 6; j++)
+    for (int j = 0; j < alfaParticle.size(); j++)
     {
-        if (alfaParticle[j])
+        if (alfaParticle.at(j))
             glColor3f(0.0f, 0.0f, 1.0f);
         else
             glColor3f(1.0f, 0.0f, 0.0f);
@@ -50,56 +44,45 @@ void display()
 
 void update(int value)
 {
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < alfaParticle.size(); i++)
     {
-        arrayX[i] += arrayVX[i];
-        arrayY[i] += arrayVY[i];
+
         int cont = 0;
-        float temp = 9999.99f;
-        float arrayT[6] = {9999.99f, 9999.99f, 9999.99f, 9999.99f, 9999.99f, 9999.99f};
+        float d = 9999.99f;
+        vector<float> arrayT;
+        for (int k = 0; k < alfaParticle.size(); k++)
+            arrayT.push_back(9999.9f);
         if (alfaParticle[i] == false)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < alfaParticle.size(); j++)
             {
                 if (alfaParticle[j] && i != j)
                 {
                     arrayT[j] = sqrt(pow(arrayX[j] - arrayX[i], 2) + pow(arrayY[j] - arrayY[i], 2));
-                    if (arrayT[j] < temp)
+                    if (arrayT[j] < d)
                     {
-                        temp = arrayT[j];
+                        d = arrayT[j];
                         cont = j;
                     }
                 }
             }
-            if (temp < 100.0f)
+            if (d == 0.0f)
+                d = 1;
+            if (d < 500.0f)
             {
-                const float dx = pos.x - otherPos.x;
-                const float dy = pos.y - otherPos.y;
-                const float nx = dx * (1 / temp);
-                const float ny = dy * (1 / temp);
-                arrayVX[i] -= nx / temp;
-                arrayVY[i] -= ny / temp;
-                // else arrayVY[i] = arrayVY[i]+5.0f;
-                // else arrayVX[i] = arrayVX[i]+5.0f;
-                /* arrayVY[i] = arrayVY[cont]-5.5f;
-                arrayVX[i] = arrayVX[cont]-5.5f; */
+                const float dx = arrayX[i] - arrayX[cont];
+                const float dy = arrayY[i] - arrayY[cont];
+                const float nx = dx * (1 / d);
+                const float ny = dy * (1 / d);
+                d = fmax(d, 0.5);
+                arrayVX[i] = arrayVX[i] - ((nx * 100) / d);
+                arrayVY[i] = arrayVY[i] - ((ny * 100) / d);
+                arrayVX[i] = arrayVX[i] * 0.95;
+                arrayVY[i] = arrayVY[i] * 0.95;
             }
-        } /* else {
-            for (int j = 0; j < 6; j++) {
-                if (alfaParticle[j] && i != j) {
-                    arrayT[j] = sqrt(pow(arrayX[j]-arrayX[i], 2) + pow(arrayY[j]-arrayY[i], 2));
-                    if (arrayT[j] < temp) {
-                        temp = arrayT[j];
-                        cont = j;
-                    }
-                }
-            }
-            if (temp < 100.0f) {
-                cout<<i<<endl;
-                arrayVY[i] = -arrayVY[cont];
-                arrayVX[i] = -arrayVX[cont];
-            }
-        } */
+        }
+        arrayX[i] = arrayX[i] + arrayVX[i];
+        arrayY[i] = arrayY[i] + arrayVY[i];
 
         if (arrayX[i] < -WIDTH / 2 + radius || arrayX[i] > WIDTH / 2 - radius)
         {
@@ -121,7 +104,39 @@ int main(int argc, char **argv)
 {
     p = 6;
     a = 2;
-    b = 1;
+
+    int a = atoi(argv[1]);
+    int p = atoi(argv[2]);
+
+    for (int i = 0; i < a; i++)
+    {
+        float g = 1.0f;
+        if (i % 2 == 0)
+            g = -1.0f;
+        alfaParticle.push_back(true);
+        float v = (float(rand()) / (float)(RAND_MAX)) * 10 * g;
+        float xp = (float(rand()) / (float)(RAND_MAX)) * 700 * g;
+        float yp = (float(rand()) / (float)(RAND_MAX)) * 400 * g;
+        arrayVX.push_back(v);
+        arrayVY.push_back(v);
+        arrayX.push_back(xp);
+        arrayY.push_back(yp);
+    }
+
+    for (int i = 0; i < p; i++)
+    {
+        float g = 1.0f;
+        if (i % 2 == 0)
+            g = -1.0f;
+        alfaParticle.push_back(false);
+        float xp = (float(rand()) / (float)(RAND_MAX)) * 700 * g;
+        float yp = (float(rand()) / (float)(RAND_MAX)) * 400 * g;
+        arrayVX.push_back(0.0f);
+        arrayVY.push_back(0.0f);
+        arrayX.push_back(xp);
+        arrayY.push_back(yp);
+    }
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(WIDTH, HEIGHT);
