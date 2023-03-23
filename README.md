@@ -11,7 +11,7 @@ Este proyecto se enfoca en el desarrollo de un screensaver desarrollado en C++. 
 ## Compilar programa secuencial
 
 ```bash
-g++ -o mainSec main2.cpp -lGL -lGLU -lglut
+g++ -o mainSec main2.cpp -lGL -lGLU -lglut -fopenmp
 ```
 
 ## Correr programa secuencial
@@ -22,7 +22,7 @@ g++ -o mainSec main2.cpp -lGL -lGLU -lglut
 ## Compilar programa paralelo
 
 ```bash
-g++ -o mainPar main2.cpp -lGL -lGLU -lglut -fopenmp
+g++ -o mainPar main_parallel.cpp -lGL -lGLU -lglut -fopenmp
 ```
 
 ## Correr programa secuencial
