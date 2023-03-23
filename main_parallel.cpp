@@ -15,6 +15,7 @@ const float radius = 10.0f;
 int thread_num = 6;
 float friction = 0.9f;
 
+// Vectores que contienen las propiedades de cada particula, si es o no una particula alfa, sus velocidaddes, y posiciones.
 vector<bool> alfaParticle;
 vector<float> arrayVX;
 vector<float> arrayVY;
@@ -26,6 +27,7 @@ void display()
     static int frame_count = 0;
     static int previous_time = glutGet(GLUT_ELAPSED_TIME);
     glClear(GL_COLOR_BUFFER_BIT);
+    // Se pintan los polygonos del circulo y se toma en cuenta si es una particula alfa o no para identificarlas con sus respecivos colores, como azul alfa y rojo beta. 
     for (int j = 0; j < alfaParticle.size(); j++)
     {
         if (alfaParticle.at(j))
@@ -47,6 +49,7 @@ void display()
 
     glutSwapBuffers();
 
+    // Se calculaas los frames por segundo con respecto al tiempo anterior de renderizado y se despliega en consola
     frame_count++;
     int current_time = glutGet(GLUT_ELAPSED_TIME);
     float elapsed_time = (current_time - previous_time) / 1000.0f; // Convert to seconds
@@ -71,6 +74,8 @@ void update(int value)
         vector<float> arrayT;
         for (int k = 0; k < alfaParticle.size(); k++)
             arrayT.push_back(9999.9f);
+        // Se inicialliza un vector que ocntendra las distancias que hay entre un beta y un alfa
+        // Si la particula es un alfa no debera de clacular esto.
         if (alfaParticle[i] == false)
         {
             for (int j = 0; j < alfaParticle.size(); j++)
@@ -87,6 +92,7 @@ void update(int value)
             }
             if (d == 0.0f)
                 d = 1;
+            /* Se calcula la velocidad correspondiente con respecto a la distancia y el alfa mas cercano, se tiene un treshold para que no este constantemente persiguiendo a las particulas alfas */
             if (d < 500.0f)
             {
                 const float dx = arrayX[i] - arrayX[cont];
@@ -100,9 +106,11 @@ void update(int value)
                 arrayVY[i] = arrayVY[i] * friction;
             }
         }
+        /*Se asigna la nueva posicion a la particula en base a su nueva velocidad*/
         arrayX[i] = arrayX[i] + arrayVX[i];
         arrayY[i] = arrayY[i] + arrayVY[i];
 
+        /*Se valida que las particulas no salgan del tamanio de la pantalla realizando una operacion para cambiar la direccion de la particula */
         if (arrayX[i] < -WIDTH / 2 + radius || arrayX[i] > WIDTH / 2 - radius)
         {
             arrayVX[i] = -arrayVX[i];
@@ -137,6 +145,7 @@ int main(int argc, char **argv)
     int p = atoi(argv[2]);
     thread_num = atoi(argv[3]);
 
+    // Se inicializan todas las particulas alfa y beta con todos sus atributos
     for (int i = 0; i < a; i++)
     {
         float g = 1.0f;
