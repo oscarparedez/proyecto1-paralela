@@ -13,6 +13,7 @@ const int WIDTH = 1920;
 const int HEIGHT = 1080;
 const float radius = 10.0f;
 int thread_num = 6;
+float friction = 0.9f;
 
 vector<bool> alfaParticle;
 vector<float> arrayVX;
@@ -93,10 +94,10 @@ void update(int value)
                 const float nx = dx * (1 / d);
                 const float ny = dy * (1 / d);
                 d = fmax(d, 0.5);
-                arrayVX[i] = arrayVX[i] - ((nx * 150) / d);
-                arrayVY[i] = arrayVY[i] - ((ny * 150) / d);
-                arrayVX[i] = arrayVX[i] * 0.95;
-                arrayVY[i] = arrayVY[i] * 0.95;
+                arrayVX[i] = arrayVX[i] - ((nx * 100) / d);
+                arrayVY[i] = arrayVY[i] - ((ny * 100) / d);
+                arrayVX[i] = arrayVX[i] * friction;
+                arrayVY[i] = arrayVY[i] * friction;
             }
         }
         arrayX[i] = arrayX[i] + arrayVX[i];
@@ -127,8 +128,14 @@ int main(int argc, char **argv)
     p = 6;
     a = 2;
 
+    if ( argc == 1) {
+        printf("Usage: mainp numeroParticulasAlfas numeroParticulasBeta\n");
+        exit (1);
+    }
+
     int a = atoi(argv[1]);
     int p = atoi(argv[2]);
+    thread_num = atoi(argv[3]);
 
     for (int i = 0; i < a; i++)
     {
@@ -158,7 +165,6 @@ int main(int argc, char **argv)
         arrayX.push_back(xp);
         arrayY.push_back(yp);
     }
-    cout<<alfaParticle.size()<<endl;
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(WIDTH, HEIGHT);

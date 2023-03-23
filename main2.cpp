@@ -11,6 +11,7 @@ float p, a;
 const int WIDTH = 1920;
 const int HEIGHT = 1080;
 const float radius = 10.0f;
+float friction = 0.9f;
 
 vector<bool> alfaParticle;
 vector<float> arrayVX;
@@ -92,8 +93,8 @@ void update(int value)
                 d = fmax(d, 0.5);
                 arrayVX[i] = arrayVX[i] - ((nx * 100) / d);
                 arrayVY[i] = arrayVY[i] - ((ny * 100) / d);
-                arrayVX[i] = arrayVX[i] * 0.95;
-                arrayVY[i] = arrayVY[i] * 0.95;
+                arrayVX[i] = arrayVX[i] * friction;
+                arrayVY[i] = arrayVY[i] * friction;
             }
         }
         arrayX[i] = arrayX[i] + arrayVX[i];
@@ -122,6 +123,11 @@ int main(int argc, char **argv)
 {
     p = 6;
     a = 2;
+
+    if ( argc == 1) {
+        printf("Usage: mainp numeroParticulasAlfas numeroParticulasBeta\n");
+        exit (1);
+    }
 
     int a = atoi(argv[1]);
     int p = atoi(argv[2]);
